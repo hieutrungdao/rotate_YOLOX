@@ -1,0 +1,2 @@
+# python tools/demo.py image -n yolox-s -c yolox_s.pth --path assets/dog.jpg --conf 0.25 --nms 0.45 --tsize 640 --save_result --device [cpu/gpu]
+python tools/demo.py video -n yolox-s -c yolox_s.pth --path assets/MOT20-01-raw.mp4 --conf 0.25 --nms 0.45 --tsize 640 --save_result --device [cpu/gpu]
