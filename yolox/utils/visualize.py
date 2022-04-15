@@ -37,7 +37,7 @@ def vis(img, boxes, angle, scores, cls_ids, conf=0.5, class_names=None):
         cy = int(box[1])
         w = int(box[2])
         h = int(box[3])
-        theta = int(np.arctan(theta)*180/np.pi)
+        theta = int(theta*180/np.pi)
         print(theta)
 
         rect = ((cx, cy), (w, h), theta)
