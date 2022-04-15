@@ -10,6 +10,7 @@ import time
 
 import numpy as np
 from pycocotools.cocoeval import COCOeval
+from pycocotools import mask as maskUtils
 
 # import torch first to make yolox._C work without ImportError of libc10.so
 # in YOLOX, env is already set in __init__.py.
@@ -21,6 +22,29 @@ class COCOeval_opt(COCOeval):
     This is a slightly modified version of the original COCO API, where the functions evaluateImg()
     and accumulate() are implemented in C++ to speedup evaluation
     """
+
+    def computeIoU(self, imgId, catId):
+        p = self.params
+        if p.useCats:
+            gt = self._gts[imgId,catId]
+            dt = self._dts[imgId,catId]
+        else:
+            gt = [_ for cId in p.catIds for _ in self._gts[imgId,cId]]
+            dt = [_ for cId in p.catIds for _ in self._dts[imgId,cId]]
+        if len(gt) == 0 and len(dt) ==0:
+            return []
+        inds = np.argsort([-d['score'] for d in dt], kind='mergesort')
+        dt = [dt[i] for i in inds]
+        if len(dt) > p.maxDets[-1]:
+            dt=dt[0:p.maxDets[-1]]
+
+        g = [g['bbox'][:4] for g in gt]
+        d = [d['bbox'][:4] for d in dt]
+
+        # compute iou between each dt and gt region
+        iscrowd = [int(o['iscrowd']) for o in gt]
+        ious = maskUtils.iou(d,g,iscrowd)
+        return ious
 
     def evaluate(self):
         """
@@ -54,10 +78,8 @@ class COCOeval_opt(COCOeval):
         # loop through images, area range, max detection number
         catIds = p.catIds if p.useCats else [-1]
 
-        if p.iouType == "segm" or p.iouType == "bbox":
-            computeIoU = self.computeIoU
-        elif p.iouType == "keypoints":
-            computeIoU = self.computeOks
+        computeIoU = self.computeIoU
+
         self.ious = {
             (imgId, catId): computeIoU(imgId, catId)
             for imgId in p.imgIds
@@ -67,6 +89,7 @@ class COCOeval_opt(COCOeval):
         maxDet = p.maxDets[-1]
 
         # <<<< Beginning of code differences with original COCO API
+
         def convert_instances_to_cpp(instances, is_det=False):
             # Convert annotations for a list of instances in an image to a format that's fast
             # to access in C++

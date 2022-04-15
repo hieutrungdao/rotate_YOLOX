@@ -8,5 +8,5 @@ from .datasets_wrapper import ConcatDataset, Dataset, MixConcatDataset
 from .mosaicdetection import MosaicDetection
 from .voc import VOCDetection
 
-from.rotate import RotateDataset
+from.rotate import RotateDataset, ValRotateDataset
 from .rotate_classes import ROTATE_CLASSES

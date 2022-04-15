@@ -212,10 +212,10 @@ class COCOEvaluator:
                 self.img_size[0] / float(img_h), self.img_size[1] / float(img_w)
             )
             bboxes /= scale
-            bboxes = xyxy2xywh(bboxes)
+            # bboxes = xyxy2xywh(bboxes)
 
-            cls = output[:, 6]
-            scores = output[:, 4] * output[:, 5]
+            cls = output[:, 7]
+            scores = output[:, 5] * output[:, 6]
             for ind in range(bboxes.shape[0]):
                 label = self.dataloader.dataset.class_ids[int(cls[ind])]
                 pred_data = {
@@ -266,12 +266,13 @@ class COCOEvaluator:
                 _, tmp = tempfile.mkstemp()
                 json.dump(data_dict, open(tmp, "w"))
                 cocoDt = cocoGt.loadRes(tmp)
-            try:
-                from yolox.layers import COCOeval_opt as COCOeval
-            except ImportError:
-                from pycocotools.cocoeval import COCOeval
+            from yolox.layers import COCOeval_opt as COCOeval
+            # try:
+            #     from yolox.layers import COCOeval_opt as COCOeval
+            # except ImportError:
+            #     from pycocotools.cocoeval import COCOeval
 
-                logger.warning("Use standard COCOeval.")
+            #     logger.warning("Use standard COCOeval.")
 
             cocoEval = COCOeval(cocoGt, cocoDt, annType[1])
             cocoEval.evaluate()
