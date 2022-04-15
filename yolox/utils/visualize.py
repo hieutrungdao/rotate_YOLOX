@@ -7,40 +7,70 @@ import numpy as np
 
 __all__ = ["vis"]
 
+def cxcywh2xyxy(bboxes):
+    box_corner = bboxes.new(bboxes.shape)
+    box_corner[:, 0] = bboxes[:, 0] - bboxes[:, 2] / 2
+    box_corner[:, 1] = bboxes[:, 1] - bboxes[:, 3] / 2
+    box_corner[:, 2] = bboxes[:, 0] + bboxes[:, 2] / 2
+    box_corner[:, 3] = bboxes[:, 1] + bboxes[:, 3] / 2
+    return box_corner
 
-def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
+def xyxy2cxcywh(bboxes):
+    bboxes[:, 2] = bboxes[:, 2] - bboxes[:, 0]
+    bboxes[:, 3] = bboxes[:, 3] - bboxes[:, 1]
+    bboxes[:, 0] = bboxes[:, 0] + bboxes[:, 2] * 0.5
+    bboxes[:, 1] = bboxes[:, 1] + bboxes[:, 3] * 0.5
+    return bboxes
+
+def vis(img, boxes, angle, scores, cls_ids, conf=0.5, class_names=None):
+
+    boxes = xyxy2cxcywh(boxes)
 
     for i in range(len(boxes)):
         box = boxes[i]
+        theta = angle[i]
         cls_id = int(cls_ids[i])
         score = scores[i]
         if score < conf:
             continue
-        x0 = int(box[0])
-        y0 = int(box[1])
-        x1 = int(box[2])
-        y1 = int(box[3])
+        cx = int(box[0])
+        cy = int(box[1])
+        w = int(box[2])
+        h = int(box[3])
+        theta = int(np.arctan(theta)*180/np.pi)
+        print(theta)
+
+        rect = ((cx, cy), (w, h), theta)
+        box = cv2.boxPoints(rect).astype(int)
+        print(box)   
 
         color = (_COLORS[cls_id] * 255).astype(np.uint8).tolist()
         text = '{}:{:.1f}%'.format(class_names[cls_id], score * 100)
+        # text = '{}:{:.1f}% {}:{:.1f}%'.format(class_names[cls_id], score * 100, "theta", theta)
         txt_color = (0, 0, 0) if np.mean(_COLORS[cls_id]) > 0.5 else (255, 255, 255)
         font = cv2.FONT_HERSHEY_SIMPLEX
 
         txt_size = cv2.getTextSize(text, font, 0.4, 1)[0]
-        cv2.rectangle(img, (x0, y0), (x1, y1), color, 2)
+        # cv2.rectangle(img, (x0, y0), (x1, y1), color, 2)
+
+        cv2.line(img, tuple(box[0]), tuple(box[1]), color, 2)
+        cv2.line(img, tuple(box[1]), tuple(box[2]), color, 2)
+        cv2.line(img, tuple(box[2]), tuple(box[3]), color, 2)
+        cv2.line(img, tuple(box[3]), tuple(box[0]), color, 2)
 
         txt_bk_color = (_COLORS[cls_id] * 255 * 0.7).astype(np.uint8).tolist()
         cv2.rectangle(
             img,
-            (x0, y0 + 1),
-            (x0 + txt_size[0] + 1, y0 + int(1.5*txt_size[1])),
+            (box[0][0], box[0][1] + 1),
+            (box[0][0] + txt_size[0] + 1, box[0][1] + int(1.5*txt_size[1])),
             txt_bk_color,
             -1
         )
-        cv2.putText(img, text, (x0, y0 + txt_size[1]), font, 0.4, txt_color, thickness=1)
+        cv2.putText(img, text, (box[0][0], box[0][1] + txt_size[1]), font, 0.4, txt_color, thickness=1)
 
     return img
 
+    
 
 _COLORS = np.array(
     [

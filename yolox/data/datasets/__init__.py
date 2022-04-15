@@ -9,3 +9,4 @@ from .mosaicdetection import MosaicDetection
 from .voc import VOCDetection
 
 from.rotate import RotateDataset
+from .rotate_classes import ROTATE_CLASSES
