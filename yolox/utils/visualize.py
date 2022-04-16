@@ -38,11 +38,9 @@ def vis(img, boxes, angle, scores, cls_ids, conf=0.5, class_names=None):
         w = int(box[2])
         h = int(box[3])
         theta = int(theta*180/np.pi)
-        print(theta)
 
         rect = ((cx, cy), (w, h), theta)
         box = cv2.boxPoints(rect).astype(int)
-        print(box)   
 
         color = (_COLORS[cls_id] * 255).astype(np.uint8).tolist()
         text = '{}:{:.1f}%'.format(class_names[cls_id], score * 100)

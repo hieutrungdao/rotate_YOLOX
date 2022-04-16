@@ -1,11 +1,11 @@
 # TODO: Update with exact module version
 numpy
-torch>=1.7
+torch==1.7.1
 opencv_python
 loguru
 scikit-image
 tqdm
-torchvision
+torchvision==0.8.2
 Pillow
 thop
 ninja
