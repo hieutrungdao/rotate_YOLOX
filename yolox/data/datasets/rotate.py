@@ -368,19 +368,21 @@ class ValRotateDataset(Dataset):
             cy = np.max((0, obj["bbox"][1]))
             w = np.max((0, obj["bbox"][2]))
             h = np.max((0, obj["bbox"][3]))
+            theta = np.max((0, obj["bbox"][4]))
+            theta = np.tan(theta*np.pi/180)
    
             if obj["area"] > 0:
-                obj["clean_bbox"] = [cx, cy, w, h]
+                obj["clean_bbox"] = [cx, cy, w, h, theta]
                 objs.append(obj)
 
         num_objs = len(objs)
 
-        res = np.zeros((num_objs, 5))
+        res = np.zeros((num_objs, 6))
 
         for ix, obj in enumerate(objs):
             cls = self.class_ids.index(obj["category_id"])
-            res[ix, 0:4] = obj["clean_bbox"]
-            res[ix, 4] = cls
+            res[ix, 0:5] = obj["clean_bbox"]
+            res[ix, 5] = cls
 
         r = min(self.img_size[0] / height, self.img_size[1] / width)
         res[:, :4] *= r

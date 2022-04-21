@@ -316,35 +316,34 @@ class Trainer:
         return model
 
     def evaluate_and_save_model(self):
-        if self.use_model_ema:
-            evalmodel = self.ema_model.ema
-        else:
-            evalmodel = self.model
-            if is_parallel(evalmodel):
-                evalmodel = evalmodel.module
+        # if self.use_model_ema:
+        #     evalmodel = self.ema_model.ema
+        # else:
+        #     evalmodel = self.model
+        #     if is_parallel(evalmodel):
+        #         evalmodel = evalmodel.module
 
-        with adjust_status(evalmodel, training=False):
-            ap50_95, ap50, summary = self.exp.eval(
-                evalmodel, self.evaluator, self.is_distributed
-            )
+        # with adjust_status(evalmodel, training=False):
+        #     ap50_95, ap50, summary = self.exp.eval(
+        #         evalmodel, self.evaluator, self.is_distributed
+        #     )
 
-        update_best_ckpt = ap50_95 > self.best_ap
-        self.best_ap = max(self.best_ap, ap50_95)
+        # update_best_ckpt = ap50_95 > self.best_ap
+        # self.best_ap = max(self.best_ap, ap50_95)
 
-        if self.rank == 0:
-            if self.args.logger == "tensorboard":
-                self.tblogger.add_scalar("val/COCOAP50", ap50, self.epoch + 1)
-                self.tblogger.add_scalar("val/COCOAP50_95", ap50_95, self.epoch + 1)
-            if self.args.logger == "wandb":
-                self.wandb_logger.log_metrics({
-                    "val/COCOAP50": ap50,
-                    "val/COCOAP50_95": ap50_95,
-                    "epoch": self.epoch + 1,
-                })
-            logger.info("\n" + summary)
-        synchronize()
-
-        self.save_ckpt("last_epoch", update_best_ckpt)
+        # if self.rank == 0:
+        #     if self.args.logger == "tensorboard":
+        #         self.tblogger.add_scalar("val/COCOAP50", ap50, self.epoch + 1)
+        #         self.tblogger.add_scalar("val/COCOAP50_95", ap50_95, self.epoch + 1)
+        #     if self.args.logger == "wandb":
+        #         self.wandb_logger.log_metrics({
+        #             "val/COCOAP50": ap50,
+        #             "val/COCOAP50_95": ap50_95,
+        #             "epoch": self.epoch + 1,
+        #         })
+        #     logger.info("\n" + summary)
+        # synchronize()
+        # self.save_ckpt("last_epoch", update_best_ckpt)
         if self.save_history_ckpt:
             self.save_ckpt(f"epoch_{self.epoch + 1}")
 

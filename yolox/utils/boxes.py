@@ -30,31 +30,32 @@ def filter_box(output, scale_range):
 
 
 def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45, class_agnostic=False):
-    conf_thre = 0.001
-    nms_thre = 0.5
-    box_corner = prediction.new(prediction.shape)
+
+    prediction[:, :, 4] = torch.atan(prediction[:, :, 4])
+    box_corner = prediction.detach().clone()
     box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
     box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
     box_corner[:, :, 2] = prediction[:, :, 0] + prediction[:, :, 2] / 2
     box_corner[:, :, 3] = prediction[:, :, 1] + prediction[:, :, 3] / 2
-    box_corner[:, :, 4] = torch.atan(prediction[:, :, 4])
-    prediction[:, :, :5] = box_corner[:, :, :5]
-
-    # box_corner = prediction
+    # prediction[:, :, :5] = box_corner[:, :, :5]
 
     output = [None for _ in range(len(prediction))]
-    for i, image_pred in enumerate(prediction):
+    for i, (xyxy_pred, pred) in enumerate(zip(box_corner, prediction)):
 
         # If none are remaining => process next image
-        if not image_pred.size(0):
+        if not xyxy_pred.size(0):
             continue
         # Get score and class with highest confidence
-        class_conf, class_pred = torch.max(image_pred[:, 6: 6 + num_classes], 1, keepdim=True)
+        class_conf, class_pred = torch.max(xyxy_pred[:, 6: 6 + num_classes], 1, keepdim=True)
 
-        conf_mask = (image_pred[:, 6] * class_conf.squeeze() >= conf_thre).squeeze()
+        conf_mask = (xyxy_pred[:, 6] * class_conf.squeeze() >= conf_thre).squeeze()
         # Detections ordered as (x1, y1, x2, y2, obj_conf, class_conf, class_pred)
-        detections = torch.cat((image_pred[:, :6], class_conf, class_pred.float()), 1)
+        detections = torch.cat((xyxy_pred[:, :6], class_conf, class_pred.float()), 1)
         detections = detections[conf_mask]
+
+        out = torch.cat((pred[:, :6], class_conf, class_pred.float()), 1)
+        out = out[conf_mask]
+        
         if not detections.size(0):
             continue
 
@@ -75,13 +76,11 @@ def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45, class_agn
         # pred_boxes = torch.cat((detections[:, :4], detections[:, 4:5] * detections[:, 5:6]), axis=1)
         # nms_out_index = set_cpu_nms(pred_boxes, nms_thre)
 
-
-        detections = detections[nms_out_index]
+        out = out[nms_out_index]
         if output[i] is None:
-            output[i] = detections
+            output[i] = out
         else:
-            output[i] = torch.cat((output[i], detections))
-
+            output[i] = torch.cat((output[i], out))
     return output
 
 
@@ -150,3 +149,5 @@ def cxcywh2xyxy(bboxes):
     box_corner[:, 2] = bboxes[:, 0] + bboxes[:, 2] / 2
     box_corner[:, 3] = bboxes[:, 1] + bboxes[:, 3] / 2
     return box_corner
+
+    

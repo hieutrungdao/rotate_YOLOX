@@ -18,9 +18,10 @@ class Exp(MyExp):
         self.train_ann = "instances_train2017.json"
         self.val_ann = "instances_val2017.json"
         # self.val_ann = "instances_train2017.json"
+        # self.train_ann = "instances_val2017.json"
 
         self.num_classes = 1
 
-        self.max_epoch = 5
+        self.max_epoch = 240
         self.data_num_workers = 6
         self.eval_interval = 1

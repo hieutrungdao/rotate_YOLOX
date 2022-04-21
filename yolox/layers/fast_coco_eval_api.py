@@ -14,8 +14,9 @@ from pycocotools import mask as maskUtils
 
 # import torch first to make yolox._C work without ImportError of libc10.so
 # in YOLOX, env is already set in __init__.py.
+import torch
 from yolox import _C
-
+from .box_iou_rotated import pairwise_iou_rotated
 
 class COCOeval_opt(COCOeval):
     """
@@ -45,6 +46,14 @@ class COCOeval_opt(COCOeval):
         iscrowd = [int(o['iscrowd']) for o in gt]
         ious = maskUtils.iou(d,g,iscrowd)
         return ious
+
+        # g = torch.FloatTensor([g['bbox'][:5] for g in gt])
+        # d = torch.FloatTensor([d['bbox'][:5] for d in dt])
+
+        # # compute iou between each dt and gt region
+        # ious = pairwise_iou_rotated(d,g)
+        # return ious
+
 
     def evaluate(self):
         """

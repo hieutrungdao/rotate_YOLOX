@@ -4,9 +4,13 @@
 import re
 import setuptools
 import glob
+import os
 from os import path
 import torch
-from torch.utils.cpp_extension import CppExtension
+from torch.utils.cpp_extension import CUDA_HOME, CppExtension, CUDAExtension
+
+torch_ver = [int(x) for x in torch.__version__.split(".")[:2]]
+assert torch_ver >= [1, 8], "Requires PyTorch >= 1.8"
 
 
 def get_extensions():
@@ -16,11 +20,35 @@ def get_extensions():
     main_source = path.join(extensions_dir, "vision.cpp")
     sources = glob.glob(path.join(extensions_dir, "**", "*.cpp"))
 
+    source_cuda = glob.glob(path.join(extensions_dir, "**", "*.cu")) + glob.glob(
+        path.join(extensions_dir, "*.cu")
+    )
+
     sources = [main_source] + sources
     extension = CppExtension
 
     extra_compile_args = {"cxx": ["-O3"]}
     define_macros = []
+
+    if (torch.cuda.is_available() and ((CUDA_HOME is not None))) or os.getenv("FORCE_CUDA", "0") == "1":
+        extension = CUDAExtension
+        sources += source_cuda
+
+        define_macros += [("WITH_CUDA", None)]
+        extra_compile_args["nvcc"] = [
+            "-O3",
+            "-DCUDA_HAS_FP16=1",
+            "-D__CUDA_NO_HALF_OPERATORS__",
+            "-D__CUDA_NO_HALF_CONVERSIONS__",
+            "-D__CUDA_NO_HALF2_OPERATORS__",
+            ]
+
+
+        if torch_ver < [1, 7]:
+            # supported by https://github.com/pytorch/pytorch/pull/43931
+            CC = os.environ.get("CC", None)
+            if CC is not None:
+                extra_compile_args["nvcc"].append("-ccbin={}".format(CC))
 
     include_dirs = [extensions_dir]
 
