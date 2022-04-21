@@ -100,7 +100,7 @@ class Trainer:
         inps, targets = self.exp.preprocess(inps, targets, self.input_size)
         data_end_time = time.time()
 
-        # torch.autograd.set_detect_anomaly(True)
+        torch.autograd.set_detect_anomaly(True)
 
         with torch.cuda.amp.autocast(enabled=self.amp_training):
             outputs = self.model(inps, targets)
@@ -204,6 +204,7 @@ class Trainer:
         logger.info("---> start train epoch{}".format(self.epoch + 1))
 
         if self.epoch + 1 == self.max_epoch - self.exp.no_aug_epochs or self.no_aug:
+        # if self.epoch + 1 == self.max_epoch - self.exp.no_aug_epochs:
             logger.info("--->No mosaic aug now!")
             self.train_loader.close_mosaic()
             logger.info("--->Add additional L1 loss now!")

@@ -23,7 +23,4 @@ class Exp(MyExp):
         self.max_epoch = 300
         self.data_num_workers = 6
         self.eval_interval = 5
-        
         self.print_interval = 100
-
-        self.output_dir = "/content/drive/MyDrive/hieudt/YOLOX_outputs"

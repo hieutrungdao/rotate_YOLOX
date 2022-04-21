@@ -110,6 +110,7 @@ class MosaicDetection(Dataset):
                 padw, padh = l_x1 - s_x1, l_y1 - s_y1
 
                 labels = _labels.copy()
+
                 # Normalized xywh to pixel xyxy format
                 if _labels.size > 0:
                     labels[:, 0] = scale * _labels[:, 0] + padw
@@ -210,7 +211,7 @@ class MosaicDetection(Dataset):
         ]
 
         cp_bboxes_origin_np = adjust_box_anns(
-            cp_labels[:, :4].copy(), cp_scale_ratio, 0, 0, origin_w, origin_h
+            cp_labels[:, :5].copy(), cp_scale_ratio, 0, 0, origin_w, origin_h
         )
         if FLIP:
             cp_bboxes_origin_np[:, 0::2] = (
@@ -224,7 +225,7 @@ class MosaicDetection(Dataset):
             cp_bboxes_transformed_np[:, 1::2] - y_offset, 0, target_h
         )
 
-        cls_labels = cp_labels[:, 4:5].copy()
+        cls_labels = cp_labels[:, 5:6].copy()
         box_labels = cp_bboxes_transformed_np
         labels = np.hstack((box_labels, cls_labels))
         origin_labels = np.vstack((origin_labels, labels))

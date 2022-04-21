@@ -158,23 +158,23 @@ class RotateExp(BaseExp):
                 cache=cache_img,
             )
 
-        # dataset = MosaicDetection(
-        #     dataset,
-        #     mosaic=not no_aug,
-        #     img_size=self.input_size,
-        #     preproc=RotateTrainTransform(
-        #         max_labels=120,
-        #         flip_prob=self.flip_prob,
-        #         hsv_prob=self.hsv_prob),
-        #     degrees=self.degrees,
-        #     translate=self.translate,
-        #     mosaic_scale=self.mosaic_scale,
-        #     mixup_scale=self.mixup_scale,
-        #     shear=self.shear,
-        #     enable_mixup=self.enable_mixup,
-        #     mosaic_prob=self.mosaic_prob,
-        #     mixup_prob=self.mixup_prob,
-        # )
+        dataset = MosaicDetection(
+            dataset,
+            mosaic=not no_aug,
+            img_size=self.input_size,
+            preproc=RotateTrainTransform(
+                max_labels=120,
+                flip_prob=self.flip_prob,
+                hsv_prob=self.hsv_prob),
+            degrees=self.degrees,
+            translate=self.translate,
+            mosaic_scale=self.mosaic_scale,
+            mixup_scale=self.mixup_scale,
+            shear=self.shear,
+            enable_mixup=self.enable_mixup,
+            mosaic_prob=self.mosaic_prob,
+            mixup_prob=self.mixup_prob,
+        )
 
         self.dataset = dataset
 
