@@ -17,6 +17,7 @@ class Exp(MyExp):
         self.data_dir = "../Pharma_COCO_format"
         self.train_ann = "instances_train2017.json"
         self.val_ann = "instances_val2017.json"
+        # self.val_ann = "instances_train2017.json"
 
         self.num_classes = 1
 

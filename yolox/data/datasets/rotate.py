@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Copyright (c) Megvii, Inc. and its affiliates.
 
+from fileinput import filename
 import os
 from loguru import logger
 
@@ -351,6 +352,8 @@ class ValRotateDataset(Dataset):
         height = im_ann["height"]
         anno_ids = self.coco.getAnnIds(imgIds=[int(id_)], iscrowd=False)
         annotations = self.coco.loadAnns(anno_ids)
+        # anno_ids = 1
+        # annotations = self.coco.loadAnns()
         objs = []
         # for obj in annotations:
         #     x1 = np.max((0, obj["bbox"][0]))

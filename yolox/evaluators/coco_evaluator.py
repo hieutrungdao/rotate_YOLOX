@@ -23,7 +23,8 @@ from yolox.utils import (
     postprocess,
     synchronize,
     time_synchronized,
-    xyxy2xywh
+    xyxy2xywh,
+    xyxy2cxcywh
 )
 
 
@@ -212,7 +213,7 @@ class COCOEvaluator:
                 self.img_size[0] / float(img_h), self.img_size[1] / float(img_w)
             )
             bboxes /= scale
-            # bboxes = xyxy2xywh(bboxes)
+            bboxes = xyxy2cxcywh(bboxes)
 
             cls = output[:, 7]
             scores = output[:, 5] * output[:, 6]
@@ -266,13 +267,15 @@ class COCOEvaluator:
                 _, tmp = tempfile.mkstemp()
                 json.dump(data_dict, open(tmp, "w"))
                 cocoDt = cocoGt.loadRes(tmp)
-            from yolox.layers import COCOeval_opt as COCOeval
-            # try:
-            #     from yolox.layers import COCOeval_opt as COCOeval
-            # except ImportError:
-            #     from pycocotools.cocoeval import COCOeval
 
-            #     logger.warning("Use standard COCOeval.")
+            # _, tmp = tempfile.mkstemp()
+            # json.dump(data_dict, open(tmp, "w"))
+            # cocoDt = cocoGt.loadRes(tmp)
+            try:
+                from yolox.layers import COCOeval_opt as COCOeval
+            except ImportError:
+                from pycocotools.cocoeval import COCOeval
+                logger.warning("Use standard COCOeval.")
 
             cocoEval = COCOeval(cocoGt, cocoDt, annType[1])
             cocoEval.evaluate()

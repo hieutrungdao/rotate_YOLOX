@@ -1,1 +1,1 @@
-python -m yolox.tools.eval -f exps/p50.py -n  yolox-s -c /mnt/nvme0n1/hieudao/RotatedObjectDetection/YOLOX/YOLOX_outputs/save_pharma/epoch_5_ckpt.pth -b 1 -d 1 --conf 0.001 [--fp16] [--fuse]
+python -m yolox.tools.eval -f exps/pharma.py -n  yolox-s -c latest_ckpt.pth -b 16 -d 1 --conf 0.0001 [--fp16] [--fuse]
