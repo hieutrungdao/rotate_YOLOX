@@ -1,1 +1,1 @@
-python -m yolox.tools.eval -f exps/p50.py -n  yolox-s -c YOLOX_outputs/pharma/epoch_240_ckpt.pth -b 16 -d 1 --conf 0.001 [--fp16] [--fuse]
+python -m yolox.tools.eval -f exps/rotated_ds.py -n  yolox-s -c pretrain.pth -b 16 -d 1 --conf 0.001 [--fp16] [--fuse]

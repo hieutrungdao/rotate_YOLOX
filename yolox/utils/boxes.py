@@ -7,6 +7,8 @@ import numpy as np
 import torch
 import torchvision
 
+from yolox.layers import pairwise_iou_rotated
+
 __all__ = [
     "filter_box",
     "postprocess",
@@ -87,6 +89,9 @@ def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45, class_agn
 def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
     if bboxes_a.shape[1] != 5 or bboxes_b.shape[1] != 5:
         raise IndexError
+    
+    # from yolox.layers import pairwise_iou_rotated
+    # return pairwise_iou_rotated(bboxes_a, bboxes_b)
 
     if xyxy:
         tl = torch.max(bboxes_a[:, None, :2], bboxes_b[:, :2])
