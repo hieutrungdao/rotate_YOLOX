@@ -155,7 +155,8 @@ class RotateDataset(Dataset):
             w = np.max((0, obj["bbox"][2]))
             h = np.max((0, obj["bbox"][3]))
             theta = np.max((0, obj["bbox"][4]))
-            theta = np.tan(theta*np.pi/180)
+            # theta = np.tan(theta*np.pi/180)
+            theta = theta*np.pi/180
    
             if obj["area"] > 0:
                 obj["clean_bbox"] = [cx, cy, w, h, theta]
@@ -369,7 +370,8 @@ class ValRotateDataset(Dataset):
             w = np.max((0, obj["bbox"][2]))
             h = np.max((0, obj["bbox"][3]))
             theta = np.max((0, obj["bbox"][4]))
-            theta = np.tan(theta*np.pi/180)
+            # theta = np.tan(theta*np.pi/180)
+            theta = theta*np.pi/180
    
             if obj["area"] > 0:
                 obj["clean_bbox"] = [cx, cy, w, h, theta]
