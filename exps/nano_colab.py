@@ -28,7 +28,7 @@ class Exp(MyExp):
 
         self.num_classes = 1
 
-        self.max_epoch = 300
+        self.max_epoch = 80
         self.data_num_workers = 6
         self.eval_interval = 5
         self.print_interval = 20
@@ -36,7 +36,7 @@ class Exp(MyExp):
         self.test_conf = 0.01
         self.nmsthre = 0.65
         self.no_aug_epochs = 300
-        self.warmup_epochs = 2
+        self.warmup_epochs = 1
         # self.basic_lr_per_img = 0.001 / 64.0
         self.output_dir = "/content/drive/MyDrive/hieudt/YOLOX_outputs"
 

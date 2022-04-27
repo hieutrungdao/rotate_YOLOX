@@ -428,7 +428,7 @@ class YOLOXHead(nn.Module):
         l1_target[:, 3] = torch.log(gt[:, 3] / stride + eps)
         l1_target[:, 4] = gt[:, 4]
         # l1_target[:, 4] = torch.tan(gt[:, 4])
-        l1_target[:, 4][torch.isinf(l1_target[:, 4])] = 0
+        l1_target[:, 4][torch.isinf(l1_target[:, 4])|torch.isnan(l1_target[:, 4])] = 0
         return l1_target
     
 
