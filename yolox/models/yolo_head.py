@@ -408,9 +408,9 @@ class YOLOXHead(nn.Module):
         else:
             loss_l1 = 0.0
 
-        reg_weight = 4.0
-        l1_weight = 2.0
-        loss = reg_weight * loss_iou + loss_obj + loss_cls + l1_weight*loss_l1
+        reg_weight = 5.0
+        l1_weight = 1.0
+        loss = reg_weight * loss_iou + loss_obj + loss_cls + l1_weight * loss_l1
 
         return (
             loss,
@@ -428,6 +428,7 @@ class YOLOXHead(nn.Module):
         l1_target[:, 3] = torch.log(gt[:, 3] / stride + eps)
         l1_target[:, 4] = gt[:, 4]
         # l1_target[:, 4] = torch.tan(gt[:, 4])
+        l1_target[:, 4][torch.isinf(l1_target[:, 4])] = 0
         return l1_target
     
 
