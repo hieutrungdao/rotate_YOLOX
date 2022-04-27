@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 def pairwise_iou_rotated(boxes1, boxes2):
     """
@@ -12,6 +13,6 @@ def pairwise_iou_rotated(boxes1, boxes2):
         iou (Tensor[N, M]): the NxM matrix containing the pairwise
             IoU values for every element in boxes1 and boxes2
     """
-    boxes1[:,4] = -boxes1[:,4]
-    boxes2[:,4] = -boxes2[:,4]
+    boxes1[:,4] = -boxes1[:,4]*180/torch.tensor(np.pi)
+    boxes2[:,4] = -boxes2[:,4]*180/torch.tensor(np.pi)
     return torch.ops.yolox.box_iou_rotated(boxes1.type(torch.float32), boxes2.type(torch.float32))
