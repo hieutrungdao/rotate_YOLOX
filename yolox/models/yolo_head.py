@@ -125,7 +125,7 @@ class YOLOXHead(nn.Module):
         self.use_l1 = False
         self.l1_loss = nn.L1Loss(reduction="none")
         self.bcewithlog_loss = nn.BCEWithLogitsLoss(reduction="none")
-        self.iou_loss = IOUloss(reduction="none", loss_type="giou")
+        self.iou_loss = IOUloss(reduction="none", loss_type="giou") # giou better for no augment
         self.strides = strides
         self.grids = [torch.zeros(1)] * len(in_channels)
 
@@ -408,8 +408,8 @@ class YOLOXHead(nn.Module):
         else:
             loss_l1 = 0.0
 
-        reg_weight = 5.0
-        l1_weight = 1.0
+        reg_weight = 4.0
+        l1_weight = 2.0
         loss = reg_weight * loss_iou + loss_obj + loss_cls + l1_weight * loss_l1
 
         return (
@@ -428,7 +428,7 @@ class YOLOXHead(nn.Module):
         l1_target[:, 3] = torch.log(gt[:, 3] / stride + eps)
         l1_target[:, 4] = gt[:, 4]
         # l1_target[:, 4] = torch.tan(gt[:, 4])
-        l1_target[:, 4][torch.isinf(l1_target[:, 4])|torch.isnan(l1_target[:, 4])] = 0
+        # l1_target[:, 4][torch.isinf(l1_target[:, 4])|torch.isnan(l1_target[:, 4])] = 0
         return l1_target
     
 

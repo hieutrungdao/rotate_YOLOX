@@ -33,7 +33,8 @@ def filter_box(output, scale_range):
 
 def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45, class_agnostic=False):
 
-    prediction[:, :, 4] = torch.atan(prediction[:, :, 4])
+    # prediction[:, :, 4] = torch.atan(prediction[:, :, 4])
+    prediction[:, :, 4] = prediction[:, :, 4]*180/(torch.tensor(np.pi))
     box_corner = prediction.detach().clone()
     box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
     box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
