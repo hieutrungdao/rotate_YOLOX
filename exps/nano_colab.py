@@ -22,16 +22,16 @@ class Exp(MyExp):
         self.enable_mixup = False
 
         # Define yourself dataset path
-        self.data_dir = "../Pharma_COCO_format"
+        self.data_dir = "../Pharmacity"
         self.train_ann = "instances_train2017.json"
         self.val_ann = "instances_val2017.json"
 
         self.num_classes = 1
 
         self.max_epoch = 80
-        self.data_num_workers = 6
+        self.data_num_workers = 8
         self.eval_interval = 5
-        self.print_interval = 20
+        self.print_interval = 10
 
         self.test_conf = 0.01
         self.nmsthre = 0.65
