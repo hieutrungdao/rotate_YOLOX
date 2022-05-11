@@ -125,7 +125,8 @@ class YOLOXHead(nn.Module):
         self.use_l1 = False
         self.l1_loss = nn.L1Loss(reduction="none")
         self.bcewithlog_loss = nn.BCEWithLogitsLoss(reduction="none")
-        self.iou_loss = IOUloss(reduction="none", loss_type="giou") # giou better for no augment
+        self.iou_loss = IOUloss(reduction="none", loss_type="iou")
+        # self.iou_loss = IOUloss(reduction="none", loss_type="giou") # giou better for no augment
         self.strides = strides
         self.grids = [torch.zeros(1)] * len(in_channels)
 
@@ -150,7 +151,7 @@ class YOLOXHead(nn.Module):
         for k, (cls_conv, reg_conv, stride_this_level, x) in enumerate(
             zip(self.cls_convs, self.reg_convs, self.strides, xin)
         ):
-            x = self.stems[k](x) 
+            x = self.stems[k](x)
             cls_x = x
             reg_x = x
 
@@ -389,7 +390,7 @@ class YOLOXHead(nn.Module):
         if self.use_l1:
             l1_targets = torch.cat(l1_targets, 0)
 
-        num_fg = max(num_fg, 1) 
+        num_fg = max(num_fg, 1)
         loss_iou = (
             self.iou_loss(bbox_preds.view(-1, 5)[fg_masks], reg_targets)
         ).sum() / num_fg
@@ -408,7 +409,7 @@ class YOLOXHead(nn.Module):
         else:
             loss_l1 = 0.0
 
-        reg_weight = 4.0
+        reg_weight = 5.0
         l1_weight = 2.0
         loss = reg_weight * loss_iou + loss_obj + loss_cls + l1_weight * loss_l1
 
@@ -430,7 +431,6 @@ class YOLOXHead(nn.Module):
         # l1_target[:, 4] = torch.tan(gt[:, 4])
         # l1_target[:, 4][torch.isinf(l1_target[:, 4])|torch.isnan(l1_target[:, 4])] = 0
         return l1_target
-    
 
     @torch.no_grad()
     def get_assignments(

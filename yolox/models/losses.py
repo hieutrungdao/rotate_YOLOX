@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 # Copyright (c) Megvii Inc. All rights reserved.
 
+import math
 import torch
 import torch.nn as nn
 from yolox.layers import pairwise_iou_rotated
@@ -32,10 +33,15 @@ class IOUloss(nn.Module):
         area_i = torch.prod(br - tl, 1) * en
         area_u = area_p + area_g - area_i
         iou = (area_i) / (area_u + 1e-16)
+
         # iou = pairwise_iou_rotated(pred, target)
 
         if self.loss_type == "iou":
             loss = 1 - iou ** 2
+            angle_factor = torch.abs(torch.cos((pred[:, 4]-math.pi/2) - (target[:, 4]-math.pi/2)))
+            # skew_iou = torch.abs(iou * angle_factor) + 1e-16
+            loss = loss * angle_factor
+
         elif self.loss_type == "giou":
             c_tl = torch.min(
                 (pred[:, :2] - pred[:, 2:4] / 2), (target[:, :2] - target[:, 2:4] / 2)
